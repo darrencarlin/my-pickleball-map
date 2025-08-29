@@ -105,14 +105,14 @@ export const CourtCard = () => {
 
   // Priority 3: Show refine card if multiple visible courts and no selected court
   if (visibleCourts.length > 1 && !court) {
-    const displayedCourts = visibleCourts.slice(0, 2);
-    const remainingCount = visibleCourts.length - 2;
+    //const displayedCourts = visibleCourts.slice(0, 2);
+    // const remainingCount = visibleCourts.length - 2;
 
     return (
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-50 bg-white/95 p-4 rounded-lg shadow-lg w-[calc(100%-2rem)] max-w-96">
         <p className="mb-1 font-bold">Refine your viewport</p>
         <p className="text-gray-500">{visibleCourts.length} courts found</p>
-        <div className="mt-2 space-y-2">
+        {/* <div className="mt-2 space-y-2">
           {displayedCourts.map((visibleCourt) => (
             <Button
               key={visibleCourt.id}
@@ -129,7 +129,7 @@ export const CourtCard = () => {
               + {remainingCount} more location{remainingCount > 1 ? "s" : ""}
             </p>
           )}
-        </div>
+        </div> */}
       </div>
     );
   }

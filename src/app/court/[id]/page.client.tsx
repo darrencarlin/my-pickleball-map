@@ -1,5 +1,6 @@
 "use client";
 
+import { format } from "date-fns";
 import { useCourt } from "@/lib/tanstack/hooks/courts";
 
 export const PageClient = ({ id }: { id: string }) => {
@@ -15,7 +16,9 @@ export const PageClient = ({ id }: { id: string }) => {
             <p>{checkIn.notes}</p>
             <p>
               <strong>Checked in at:</strong>{" "}
-              {new Date(checkIn.createdAt).toLocaleString()}
+              {format(new Date(checkIn.createdAt), "EEEE, do MMMM")} at{" "}
+              {format(new Date(checkIn.createdAt), "h:mm")}
+              {format(new Date(checkIn.createdAt), "aaa").toLowerCase()}
             </p>
           </li>
         ))}

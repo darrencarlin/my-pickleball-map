@@ -2,10 +2,10 @@
 
 import { MapPin } from "lucide-react";
 import { useSetMapView } from "@/lib/hooks/use-set-map-view";
+
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import {
   setBounds,
-  setCourt,
   setCustomCoordinates,
   setIsSelectingLocation,
   setViewState,
@@ -89,6 +89,20 @@ export const MyMap = () => {
     }
   };
 
+  const handleCourtClick = useCallback(
+    (court: { longitude: number; latitude: number }) => {
+      // Zoom to the court location
+      if (mapRef.current) {
+        mapRef.current.flyTo({
+          center: [court.longitude, court.latitude],
+          zoom: 16,
+          duration: 1000,
+        });
+      }
+    },
+    []
+  );
+
   // Update visible locations when courts data is available and map is positioned
   useEffect(() => {
     if (
@@ -130,7 +144,7 @@ export const MyMap = () => {
             key={court.id}
             longitude={court.longitude}
             latitude={court.latitude}
-            onClick={() => dispatch(setCourt(court))}
+            onClick={() => handleCourtClick(court)}
           >
             <div
               data-id={String(court.id)}

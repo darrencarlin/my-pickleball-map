@@ -99,6 +99,30 @@ export async function fetchApi<T>(
 }
 
 // ======================
+// Date Utilities
+// ======================
+/**
+ * Returns the ordinal suffix for a given day number (e.g., "st", "nd", "rd", "th")
+ * @param day - The day number (1-31)
+ * @returns The ordinal suffix string
+ */
+export function getDaySuffix(day: number): string {
+  if (day >= 11 && day <= 13) {
+    return "th";
+  }
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+}
+
+// ======================
 // Geometry Utilities
 // ======================
 /**
@@ -126,12 +150,9 @@ export const getVisibleMapLocations = (map: MapReference) => {
 
   const container = map.current.getContainer();
 
-  console.log("Map container:", container);
   const markers = container.getElementsByClassName("marker");
-  console.log("Map markers:", markers);
-  const containerRect = container.getBoundingClientRect();
 
-  console.log("Container rect:", containerRect);
+  const containerRect = container.getBoundingClientRect();
 
   const visibles: Element[] = [];
 
@@ -142,8 +163,6 @@ export const getVisibleMapLocations = (map: MapReference) => {
       visibles.push(marker);
     }
   }
-
-  console.log("Visible markers:", visibles);
 
   return visibles.length > 0
     ? Array.from(visibles).map((el) => el.getAttribute("data-id"))
