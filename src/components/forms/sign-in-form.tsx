@@ -44,7 +44,7 @@ export const SignInForm = () => {
       {
         email,
         password,
-        callbackURL: "/",
+        callbackURL: "/map",
       },
       {
         onSuccess: () => {
@@ -60,11 +60,11 @@ export const SignInForm = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center gap-6">
+    <div className="flex flex-col w-full gap-4">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4 max-w-xl mx-auto"
+          className="w-full space-y-4"
         >
           {/* Email */}
           <FormField
@@ -74,11 +74,7 @@ export const SignInForm = () => {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="you@example.com"
-                    type="email"
-                    {...field}
-                  />
+                  <Input type="email" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -93,20 +89,20 @@ export const SignInForm = () => {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input placeholder="********" type="password" {...field} />
+                  <Input type="password" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full font-bold" disabled={loading}>
             {loading ? "Signing in..." : "Sign In"}
           </Button>
         </form>
       </Form>
 
-      <div>
+      <div className="text-center">
         Need an account?{" "}
         <Link href="/auth/sign-up" className="underline">
           Sign Up

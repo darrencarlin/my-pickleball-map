@@ -69,9 +69,9 @@ export const AddLocationButton = () => {
           size="sm"
           variant="secondary"
           onClick={handleCancelSelection}
-          className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 shadow-lg flex items-center gap-3"
+          className="absolute z-20 flex items-center shadow-lg top-4 left-1/2 transform -translate-x-1/2 gap-3"
         >
-          Click on the map to select location <X className="h-3 w-3" />
+          Click on the map to select location <X className="w-3 h-3" />
         </Button>
       )}
     </>

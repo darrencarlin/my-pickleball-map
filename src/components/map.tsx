@@ -117,7 +117,7 @@ export const MyMap = () => {
           >
             <div
               data-id={String(court.id)}
-              className="flex items-center justify-center bg-lime-400 rounded-full w-8 h-8 shadow-lg marker"
+              className="flex items-center justify-center w-8 h-8 rounded-full shadow-lg bg-lime-400 marker"
             >
               <Pickball />
             </div>
@@ -130,7 +130,7 @@ export const MyMap = () => {
             longitude={customCoordinates.longitude}
             latitude={customCoordinates.latitude}
           >
-            <div className="flex items-center justify-center bg-red-500 rounded-full w-8 h-8 border border-white">
+            <div className="flex items-center justify-center w-8 h-8 bg-red-500 border border-white rounded-full">
               <MapPin className="text-white" size={18} />
             </div>
           </Marker>

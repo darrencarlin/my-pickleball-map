@@ -28,8 +28,8 @@ const CourtCardContent = ({
       ref={cardRef}
       className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-50 bg-white/95 p-4 rounded-lg shadow-lg w-[calc(100%-2rem)] max-w-96"
     >
-      <p className="font-bold mb-2 text-lg">{court.name}</p>
-      <p className="text-gray-500 mb-4">
+      <p className="mb-2 text-lg font-bold">{court.name}</p>
+      <p className="mb-4 text-gray-500">
         You have played at {court.name}{" "}
         <span className="font-bold">{court.playCount}</span> times.
       </p>
@@ -115,7 +115,7 @@ export const CourtCard = () => {
               variant="outline"
               type="button"
               onClick={() => handleSelectCourt(visibleCourt)}
-              className="w-full text-left justify-start"
+              className="justify-start w-full text-left"
             >
               {visibleCourt.name}
             </Button>
