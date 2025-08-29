@@ -4,7 +4,7 @@ import { useRef } from "react";
 import type { Court } from "@/lib/db/schema";
 import { useOutsideClick } from "@/lib/hooks/use-outside-click";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { setCourt, setVisibleCourts } from "@/lib/redux/slices/app";
+import { setCourt } from "@/lib/redux/slices/app";
 import { useEditCourt } from "@/lib/tanstack/hooks/courts";
 import { Button } from "../ui/button";
 
@@ -26,7 +26,7 @@ const CourtCardContent = ({
   return (
     <div
       ref={cardRef}
-      className="absolute bottom-4 md:right-4 left-4 z-50 bg-white/95 p-4 rounded-lg shadow-lg w-[90vw] md:w-96"
+      className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-50 bg-white/95 p-4 rounded-lg shadow-lg w-[calc(100%-2rem)] max-w-96"
     >
       <p className="font-bold mb-2 text-lg">{court.name}</p>
       <p className="text-gray-500 mb-4">
@@ -105,7 +105,7 @@ export const CourtCard = () => {
     const remainingCount = visibleCourts.length - 2;
 
     return (
-      <div className="absolute bottom-4 md:right-4 left-4 z-50 bg-white/95 p-4 rounded-lg shadow-lg w-[90vw] md:w-96">
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-50 bg-white/95 p-4 rounded-lg shadow-lg w-[calc(100%-2rem)] max-w-96">
         <p className="mb-1 font-bold">Refine your viewport</p>
         <p className="text-gray-500">{visibleCourts.length} courts found</p>
         <div className="mt-2 space-y-2">
