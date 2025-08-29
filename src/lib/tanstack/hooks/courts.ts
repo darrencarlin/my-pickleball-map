@@ -68,7 +68,6 @@ export const useEditCourt = () => {
     },
 
     onSuccess: ({ data }) => {
-      dispatch(setModal({ modal: "edit-court", value: false }));
       dispatch(setCourt(data));
     },
     onError: (error) => {

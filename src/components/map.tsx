@@ -44,19 +44,12 @@ export const MyMap = () => {
   const updateVisibleLocations = useCallback(() => {
     // Get visible locations on the map
     const mapLocations = getVisibleMapLocations(mapRef);
-
-    console.log("Visible map locations:", mapLocations);
-
     // Filter locations to only include those that are visible on the map
     const filteredLocations = courts?.filter((court) =>
       mapLocations.includes(court.id)
     );
-
-    console.log("Filtered locations:", filteredLocations);
-
     // Sort locations by name
     filteredLocations?.sort((a, b) => a.name?.localeCompare(b.name ?? "") ?? 0);
-
     // Set visible locations
     dispatch(setVisibleCourts(filteredLocations ?? []));
   }, [courts, dispatch]);

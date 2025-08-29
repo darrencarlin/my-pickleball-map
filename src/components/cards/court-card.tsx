@@ -1,6 +1,5 @@
 "use client";
 
-import { X } from "lucide-react";
 import { useRef } from "react";
 import type { Court } from "@/lib/db/schema";
 import { useOutsideClick } from "@/lib/hooks/use-outside-click";
