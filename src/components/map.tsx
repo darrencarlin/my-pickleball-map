@@ -50,7 +50,7 @@ export const MyMap = () => {
   }, []);
 
   return (
-    <div className="w-screen h-screen relative">
+    <div className="w-screen h-[100dvh] relative">
       <MapboxMap
         id="map"
         ref={mapRef}
