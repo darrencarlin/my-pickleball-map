@@ -117,7 +117,7 @@ export const MyMap = () => {
           >
             <div
               data-id={String(court.id)}
-              className="flex items-center justify-center bg-primary rounded-full w-8 h-8 shadow-lg marker"
+              className="flex items-center justify-center bg-lime-400 rounded-full w-8 h-8 shadow-lg marker"
             >
               <Pickball />
             </div>
