@@ -1,7 +1,14 @@
-export default function Home() {
+import Link from "next/link";
+import { SignOutButton } from "@/components/buttons/sign-out-button";
+
+export default async function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <p className="text-5xl font-bold">Hi Ralph</p>
-    </div>
+    <main className="p-4">
+      <Link href="/map" className="block underline mb-4">
+        Go To Map
+      </Link>
+
+      <SignOutButton />
+    </main>
   );
 }
