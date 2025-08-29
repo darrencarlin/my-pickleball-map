@@ -96,7 +96,7 @@ export const MyMap = () => {
         setViewState({
           longitude: userLocation.longitude,
           latitude: userLocation.latitude,
-          zoom: 16,
+          zoom: 15,
           bearing: 0,
           pitch: 0,
         })
