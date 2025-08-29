@@ -32,8 +32,8 @@ export default async function Page() {
   return (
     <MapProvider>
       <MyMap />
-      <CourtCard />
       <AddLocationButton />
+      <CourtCard />
     </MapProvider>
   );
 }

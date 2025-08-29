@@ -1,9 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { Court } from "@/lib/db/schema";
-import type { MapViewState } from "@/lib/types";
+import type { MapViewState, Payload } from "@/lib/types";
 
 interface AppState {
   court: Court | null;
+  visibleCourts: Court[];
+  bounds: [number, number, number, number] | null;
   viewState: MapViewState;
   isSelectingLocation: boolean;
   customCoordinates: {
@@ -14,6 +16,8 @@ interface AppState {
 
 const initialState: AppState = {
   court: null,
+  visibleCourts: [],
+  bounds: null,
   viewState: {
     longitude: -100,
     latitude: 40,
@@ -29,6 +33,12 @@ export const appSlice = createSlice({
   reducers: {
     setCourt: (state, action) => {
       state.court = action.payload;
+    },
+    setVisibleCourts: (state, action: Payload<Court[]>) => {
+      state.visibleCourts = action.payload;
+    },
+    setBounds: (state, action: Payload<[number, number, number, number]>) => {
+      state.bounds = action.payload;
     },
     setViewState: (state, action) => {
       state.viewState = action.payload;
@@ -48,6 +58,8 @@ export const appSlice = createSlice({
 
 export const {
   setCourt,
+  setVisibleCourts,
+  setBounds,
   setViewState,
   setIsSelectingLocation,
   setCustomCoordinates,
