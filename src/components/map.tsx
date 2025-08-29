@@ -1,6 +1,7 @@
 "use client";
 
 import { MapPin } from "lucide-react";
+import { useSetMapView } from "@/lib/hooks/use-set-map-view";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import {
   setBounds,
@@ -11,6 +12,8 @@ import {
   setVisibleCourts,
 } from "@/lib/redux/slices/app";
 import { useCourts } from "@/lib/tanstack/hooks/courts";
+import type { ViewStateChangeEvent } from "@/lib/types";
+import { getVisibleMapLocations } from "@/lib/utils";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useCallback, useEffect, useRef } from "react";
 import MapboxMap, {
@@ -19,9 +22,7 @@ import MapboxMap, {
   type MapRef,
   Marker,
 } from "react-map-gl/mapbox";
-import { useCoordinates } from "@/lib/hooks/use-coordinates";
-import type { ViewStateChangeEvent } from "@/lib/types";
-import { getVisibleMapLocations } from "@/lib/utils";
+import { useTriggerGeoControl } from "@/lib/hooks/use-trigger-geo";
 import { Pickball } from "./icons/pickleball";
 
 export const MyMap = () => {
@@ -29,7 +30,6 @@ export const MyMap = () => {
   const mapRef = useRef<MapRef>(null);
 
   const { data: courts } = useCourts();
-  const userLocation = useCoordinates();
 
   const dispatch = useAppDispatch();
 
@@ -89,33 +89,24 @@ export const MyMap = () => {
     }
   };
 
-  // Set map view to user's location when coordinates are available
+  // Update visible locations when courts data is available and map is positioned
   useEffect(() => {
-    if (userLocation.latitude && userLocation.longitude) {
-      dispatch(
-        setViewState({
-          longitude: userLocation.longitude,
-          latitude: userLocation.latitude,
-          zoom: 15,
-          bearing: 0,
-          pitch: 0,
-        })
-      );
-    } else if (userLocation.error) {
-      console.warn("Could not get user location:", userLocation.error);
+    if (
+      courts &&
+      courts.length > 0 &&
+      viewState.latitude &&
+      viewState.longitude
+    ) {
+      // Small delay to ensure map has rendered
+      const timer = setTimeout(() => {
+        updateVisibleLocations();
+      }, 500);
+      return () => clearTimeout(timer);
     }
-  }, [userLocation, dispatch]);
+  }, [courts, viewState.latitude, viewState.longitude, updateVisibleLocations]);
 
-  // Trigger geolocation control to show blue dot after map loads
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (geoControlRef.current) {
-        geoControlRef.current.trigger();
-      }
-    }, 1500); // Wait a bit longer to ensure map is fully loaded
-
-    return () => clearTimeout(timer);
-  }, []);
+  useSetMapView();
+  useTriggerGeoControl(geoControlRef);
 
   return (
     <div className="w-screen h-[100dvh] relative">

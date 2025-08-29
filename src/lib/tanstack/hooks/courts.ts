@@ -1,11 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { COURT_QUERY_KEY, COURTS_QUERY_KEY } from "@/lib/constants";
-import { addCourt, editCourt, getCourts } from "@/lib/db/queries";
-import type { NewCourt, PartialCourt } from "@/lib/db/schema";
+import { COURTS_QUERY_KEY } from "@/lib/constants";
+import { addCourt, editCourt, getCourt, getCourts } from "@/lib/db/queries";
+import type { Court, NewCourt, PartialCourt } from "@/lib/db/schema";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { setCourt } from "@/lib/redux/slices/app";
 import { setModal } from "@/lib/redux/slices/modal";
+
+export const useCourt = (courtId: Court["id"]) => {
+  return useQuery({
+    queryKey: [COURTS_QUERY_KEY, courtId],
+    queryFn: async () => {
+      const { data } = await getCourt(courtId);
+      return data;
+    },
+  });
+};
 
 export const useCourts = () => {
   return useQuery({
@@ -52,22 +62,6 @@ export const useEditCourt = () => {
       const { data, success, message } = await editCourt(court);
       return { data, success, message };
     },
-    // Optimistically update to the new value
-    onMutate: async (newCourt) => {
-      await queryClient.cancelQueries({
-        queryKey: [COURT_QUERY_KEY, newCourt.id],
-      });
-
-      const previousCourt = queryClient.getQueryData([
-        COURT_QUERY_KEY,
-        newCourt.id,
-      ]);
-
-      queryClient.setQueryData([COURT_QUERY_KEY, newCourt.id], newCourt);
-
-      return { previousCourt, newCourt };
-    },
-
     onSuccess: ({ data }) => {
       // Only update the selected court state if this court is currently selected
       // This prevents the court card from staying open after check-in when user tries to close it

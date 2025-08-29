@@ -1,10 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useRef } from "react";
 import type { Court } from "@/lib/db/schema";
 import { useOutsideClick } from "@/lib/hooks/use-outside-click";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { setCourt } from "@/lib/redux/slices/app";
+import { useAddCheckin } from "@/lib/tanstack/hooks/check-ins";
 import { useEditCourt } from "@/lib/tanstack/hooks/courts";
 import { Button } from "../ui/button";
 
@@ -33,16 +35,17 @@ const CourtCardContent = ({
         You have played at {court.name}{" "}
         <span className="font-bold">{court.playCount}</span> times.
       </p>
-      <div className="flex justify-between">
+      <div className="flex gap-4">
         <Button
+          className="flex-1"
           type="button"
           onClick={() => handleCheckIn(court)}
           disabled={isPending}
         >
           {isPending ? "Checking In..." : "Check In"}
         </Button>
-        <Button variant="outline" type="button">
-          View Details
+        <Button asChild variant="outline" type="button">
+          <Link href={`/court/${court.id}`}>Details</Link>
         </Button>
       </div>
     </div>
@@ -52,6 +55,7 @@ const CourtCardContent = ({
 export const CourtCard = () => {
   const dispatch = useAppDispatch();
   const { mutate: editCourt, isPending } = useEditCourt();
+  const { mutate: addCheckin } = useAddCheckin();
   const visibleCourts = useAppSelector((state) => state.app.visibleCourts);
   const court = useAppSelector((state) => state.app.court);
 
@@ -60,15 +64,15 @@ export const CourtCard = () => {
   };
 
   const handleCheckIn = (court: Court) => {
-    const id = court.id;
-    const count = court.playCount ?? 0;
-
     const body: Partial<Court> = {
-      id,
-      playCount: count + 1,
+      id: court.id,
+      playCount: (court.playCount ?? 0) + 1,
     };
 
+    // Increase play count
     editCourt(body);
+    // Add check-in
+    addCheckin(court.id);
   };
 
   const handleSelectCourt = (selectedCourt: Court) => {
