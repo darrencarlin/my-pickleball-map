@@ -15,6 +15,7 @@ export const auth = betterAuth({
       verification: schema.verification,
     },
   }),
+  trustedOrigins: ["http://localhost:3000", "https://www.mypickleballmap.com"],
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,
