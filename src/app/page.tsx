@@ -57,7 +57,7 @@ export default async function Home() {
             track of your favorite courts and see how often you play.
           </p>
 
-          <div className="flex flex-col justify-center sm:flex-row gap-4">
+          <div className="flex flex-col justify-center gap-4 sm:flex-row">
             {session ? (
               <Button
                 asChild
@@ -87,7 +87,7 @@ export default async function Home() {
         </div>
 
         {/* Features Section */}
-        <div className="mt-20 grid md:grid-cols-3 gap-8">
+        <div className="grid gap-8 mt-20 md:grid-cols-3">
           <div className="p-6 bg-white border border-green-100 rounded-lg shadow-sm">
             <div className="flex items-center justify-center w-12 h-12 mb-4 bg-green-100 rounded-lg">
               <MapPin className="w-6 h-6 text-green-600" />
@@ -111,7 +111,7 @@ export default async function Home() {
             </h3>
             <p className="text-gray-600">
               Check into courts when you play and keep track of your favorite
-              locations. See how many times you've played at each court.
+              locations. See how many times you&apos;ve played at each court.
             </p>
           </div>
 

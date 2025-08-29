@@ -19,6 +19,7 @@ import MapboxMap, {
   type MapRef,
   Marker,
 } from "react-map-gl/mapbox";
+import { useCoordinates } from "@/lib/hooks/use-coordinates";
 import type { ViewStateChangeEvent } from "@/lib/types";
 import { getVisibleMapLocations } from "@/lib/utils";
 import { Pickball } from "./icons/pickleball";
@@ -28,6 +29,7 @@ export const MyMap = () => {
   const mapRef = useRef<MapRef>(null);
 
   const { data: courts } = useCourts();
+  const userLocation = useCoordinates();
 
   const dispatch = useAppDispatch();
 
@@ -87,8 +89,32 @@ export const MyMap = () => {
     }
   };
 
+  // Set map view to user's location when coordinates are available
   useEffect(() => {
-    geoControlRef?.current?.trigger();
+    if (userLocation.latitude && userLocation.longitude) {
+      dispatch(
+        setViewState({
+          longitude: userLocation.longitude,
+          latitude: userLocation.latitude,
+          zoom: 16,
+          bearing: 0,
+          pitch: 0,
+        })
+      );
+    } else if (userLocation.error) {
+      console.warn("Could not get user location:", userLocation.error);
+    }
+  }, [userLocation, dispatch]);
+
+  // Trigger geolocation control to show blue dot after map loads
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (geoControlRef.current) {
+        geoControlRef.current.trigger();
+      }
+    }, 1500); // Wait a bit longer to ensure map is fully loaded
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
