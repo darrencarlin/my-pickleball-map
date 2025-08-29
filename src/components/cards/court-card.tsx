@@ -4,7 +4,7 @@ import { useRef } from "react";
 import type { Court } from "@/lib/db/schema";
 import { useOutsideClick } from "@/lib/hooks/use-outside-click";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { setCourt } from "@/lib/redux/slices/app";
+import { setCourt, setVisibleCourts } from "@/lib/redux/slices/app";
 import { useEditCourt } from "@/lib/tanstack/hooks/courts";
 import { Button } from "../ui/button";
 

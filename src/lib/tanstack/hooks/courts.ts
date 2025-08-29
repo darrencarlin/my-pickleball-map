@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { COURT_QUERY_KEY, COURTS_QUERY_KEY } from "@/lib/constants";
 import { addCourt, editCourt, getCourts } from "@/lib/db/queries";
 import type { NewCourt, PartialCourt } from "@/lib/db/schema";
-import { useAppDispatch } from "@/lib/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { setCourt } from "@/lib/redux/slices/app";
 import { setModal } from "@/lib/redux/slices/modal";
 
@@ -45,6 +45,7 @@ export const useAddCourt = () => {
 export const useEditCourt = () => {
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
+  const currentCourt = useAppSelector((state) => state.app.court);
 
   return useMutation({
     mutationFn: async (court: PartialCourt) => {
@@ -68,7 +69,11 @@ export const useEditCourt = () => {
     },
 
     onSuccess: ({ data }) => {
-      dispatch(setCourt(data));
+      // Only update the selected court state if this court is currently selected
+      // This prevents the court card from staying open after check-in when user tries to close it
+      if (currentCourt?.id === data.id) {
+        dispatch(setCourt(data));
+      }
     },
     onError: (error) => {
       toast.error(error.message ?? "Failed to update court");

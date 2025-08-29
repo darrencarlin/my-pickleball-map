@@ -21,7 +21,6 @@ import { Button } from "../ui/button";
 export const AddLocationButton = () => {
   const dispatch = useAppDispatch();
   const modal = useAppSelector((state) => state.modal["add-court"]);
-  const court = useAppSelector((state) => state.app.court);
   const customCoordinates = useAppSelector(
     (state) => state.app.customCoordinates
   );
@@ -39,8 +38,6 @@ export const AddLocationButton = () => {
     dispatch(setIsSelectingLocation(false));
     dispatch(setModal({ modal: "add-court", value: true }));
   };
-
-  if (court) return null;
 
   return (
     <>
