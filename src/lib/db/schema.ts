@@ -90,7 +90,9 @@ export type CheckIns = CheckIn[];
 
 export type NewImage = Omit<Image, "id" | "createdAt" | "updatedAt">;
 export type Image = typeof image.$inferSelect;
+export type ImageWithUrl = Image & { url: string };
 export type Images = Image[];
+export type ImagesWithUrl = ImageWithUrl[];
 
 export const image = pgTable(
   "image",

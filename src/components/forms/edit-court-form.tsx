@@ -2,8 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
+import { ExistingImages } from "@/components/existing-images";
+import { MediaUpload } from "@/components/media-upload";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -16,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useCourt, useEditCourt } from "@/lib/tanstack/hooks/courts";
+import { useImages } from "@/lib/tanstack/hooks/images";
 
 const formSchema = z.object({
   name: z
@@ -25,7 +29,6 @@ const formSchema = z.object({
     })
     .max(100),
   description: z.string().max(500),
-
   image: z.string().max(500),
 });
 
@@ -36,7 +39,9 @@ interface Props {
 export const EditCourtForm = ({ id }: Props) => {
   const router = useRouter();
   const { data: court } = useCourt(id);
+  const { data: existingImages } = useImages({ courtId: id });
   const { mutate: updateCourt, isPending, isSuccess } = useEditCourt();
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -56,7 +61,7 @@ export const EditCourtForm = ({ id }: Props) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {/* Name */}
         <FormField
           control={form.control}
@@ -71,6 +76,7 @@ export const EditCourtForm = ({ id }: Props) => {
             </FormItem>
           )}
         />
+
         {/* Description */}
         <FormField
           control={form.control}
@@ -86,13 +92,13 @@ export const EditCourtForm = ({ id }: Props) => {
           )}
         />
 
-        {/* Image */}
+        {/* Legacy Image URL */}
         <FormField
           control={form.control}
           name="image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Image</FormLabel>
+              <FormLabel>Image URL (Legacy)</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -100,6 +106,27 @@ export const EditCourtForm = ({ id }: Props) => {
             </FormItem>
           )}
         />
+
+        {/* Existing Images */}
+        {existingImages && existingImages.length > 0 && (
+          <div className="space-y-2">
+            <FormLabel>Current Images</FormLabel>
+            <ExistingImages images={existingImages} />
+          </div>
+        )}
+
+        {/* New Image Upload */}
+        <div className="space-y-2">
+          <FormLabel>Add New Images</FormLabel>
+          <MediaUpload
+            value={selectedFiles}
+            onChange={setSelectedFiles}
+            courtId={id}
+            maxFiles={10}
+            multiple={true}
+            autoUpload={true}
+          />
+        </div>
 
         <Button type="submit" className="w-full">
           {isPending ? "Saving..." : "Save"}

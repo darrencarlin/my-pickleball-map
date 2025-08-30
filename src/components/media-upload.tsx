@@ -14,10 +14,7 @@ import {
   FileUploadTrigger,
 } from "@/components/ui/file-upload";
 import type { Images } from "@/lib/db/schema";
-import { uploadImage } from "@/lib/queries";
-import { useAppDispatch, useAppSelector } from "@/lib/state/hooks";
-import { addReviewImageId, setUploading } from "@/lib/state/slices/review";
-import { handleClientNotification } from "@/lib/utils";
+import { useUploadImage } from "@/lib/tanstack/hooks/images";
 
 type MediaUploadProps = {
   maxFiles?: number;
@@ -27,96 +24,102 @@ type MediaUploadProps = {
   value: File[];
   onChange: (files: File[]) => void;
   existingImages?: Images;
-  autoUpload?: boolean; // New prop to enable auto-upload
+  autoUpload?: boolean;
+  courtId?: string;
+  checkinId?: string;
 };
 
 export const MediaUpload = ({
-  maxFiles = 1,
-  maxSize = 5 * 1024 * 1024,
-  multiple = false,
+  maxFiles = 5,
+  maxSize = 10 * 1024 * 1024, // 10MB
+  multiple = true,
   accept = "image/jpeg,image/png,image/webp,image/jpg",
   value,
   onChange,
-  autoUpload = false,
+  autoUpload = true,
+  courtId,
+  checkinId,
 }: MediaUploadProps) => {
-  const dispatch = useAppDispatch();
-  const reviewId = useAppSelector((state) => state.review.id);
+  const uploadImageMutation = useUploadImage();
   const [uploadingFiles, setUploadingFiles] = React.useState<Set<string>>(
     new Set()
   );
-  const uploadingFilesRef = React.useRef<Set<string>>(new Set());
+  const previousLengthRef = React.useRef(value.length);
 
   // Create a consistent key format for tracking files locally
   const createFileKey = React.useCallback((file: File) => {
-    // Use file properties for local tracking before upload
     return `${file.name}-${file.size}-${file.lastModified}`;
   }, []);
 
   const uploadSingleImage = React.useCallback(
     async (file: File) => {
-      if (!autoUpload || !reviewId) {
+      if (!autoUpload || (!courtId && !checkinId)) {
         return;
       }
-
-      dispatch(setUploading(true));
 
       const fileKey = createFileKey(file);
 
-      // Prevent duplicate uploads using ref to avoid dependency issues
-      if (uploadingFilesRef.current.has(fileKey)) {
+      // Prevent duplicate uploads
+      if (uploadingFiles.has(fileKey)) {
+        console.log(`Skipping duplicate upload for ${fileKey}`);
         return;
       }
 
-      uploadingFilesRef.current.add(fileKey);
+      console.log(`Starting upload for ${fileKey}`);
       setUploadingFiles((prev) => new Set(prev).add(fileKey));
 
       try {
         const formData = new FormData();
         formData.append("image", file);
 
-        const result = await uploadImage(formData);
+        if (courtId) formData.append("courtId", courtId);
+        if (checkinId) formData.append("checkinId", checkinId);
 
-        if (result?.success && result?.data?.id) {
-          const imageId = result.data.id;
+        await uploadImageMutation.mutateAsync(formData);
+        console.log(`Upload completed for ${fileKey}`);
 
-          dispatch(addReviewImageId(imageId));
-        } else {
-          throw new Error(result?.message || "Upload failed");
-        }
+        // Remove the file from local state after successful upload
+        onChange(value.filter((f) => createFileKey(f) !== fileKey));
       } catch (error) {
         console.error("Image upload error:", error);
-        handleClientNotification({
-          message: "Failed to upload image. Please try again.",
-        });
-
-        // Note: We don't remove the file from local state here to avoid dependency issues
-        // The user can manually remove failed uploads if needed
       } finally {
-        uploadingFilesRef.current.delete(fileKey);
         setUploadingFiles((prev) => {
           const newSet = new Set(prev);
           newSet.delete(fileKey);
           return newSet;
         });
-        dispatch(setUploading(false));
       }
     },
-    [autoUpload, reviewId, dispatch, createFileKey]
+    [
+      autoUpload,
+      courtId,
+      checkinId,
+      uploadingFiles,
+      createFileKey,
+      uploadImageMutation,
+      onChange,
+      value,
+    ]
   );
 
   const handleFileChange = React.useCallback(
     (files: File[]) => {
-      const previousLength = value.length;
+      const previousLength = previousLengthRef.current;
+      previousLengthRef.current = files.length;
+      console.log(`File change: ${previousLength} -> ${files.length}`);
       onChange(files);
 
       // Auto-upload newly added files
       if (autoUpload && files.length > previousLength) {
-        // Get the newly added files (should be the last ones in the array)
         const newFiles = files.slice(previousLength);
-        newFiles.forEach(uploadSingleImage);
+        console.log(`Auto-uploading ${newFiles.length} new files`);
+        // Use setTimeout to ensure this runs after the state update
+        setTimeout(() => {
+          newFiles.forEach(uploadSingleImage);
+        }, 0);
       }
     },
-    [onChange, autoUpload, value.length, uploadSingleImage]
+    [onChange, autoUpload, uploadSingleImage]
   );
 
   const handleFileRemove = React.useCallback(
@@ -127,6 +130,7 @@ export const MediaUpload = ({
     },
     [value, onChange]
   );
+
   const onFileReject = React.useCallback((_file: File, message: string) => {
     // Make file rejection messages more user-friendly
     let userFriendlyMessage = message;
@@ -139,9 +143,7 @@ export const MediaUpload = ({
         "This image is too large. Please choose a smaller image";
     }
 
-    handleClientNotification({
-      message: userFriendlyMessage,
-    });
+    console.warn(userFriendlyMessage);
   }, []);
 
   return (
@@ -175,12 +177,12 @@ export const MediaUpload = ({
 
       {value?.length > 0 && (
         <FileUploadList>
-          {value.map((file, index) => {
+          {value.map((file) => {
             const fileKey = `${file.name}-${file.size}-${file.lastModified}`;
             const isUploading = uploadingFiles.has(fileKey);
 
             return (
-              <FileUploadItem key={index} value={file}>
+              <FileUploadItem key={fileKey} value={file}>
                 <FileUploadItemPreview />
                 <FileUploadItemMetadata />
                 <FileUploadItemDelete asChild>
@@ -189,7 +191,13 @@ export const MediaUpload = ({
                     size="icon"
                     className="size-7"
                     disabled={isUploading}
-                    onClick={() => handleFileRemove(index)}
+                    onClick={() => {
+                      const fileIndex = value.findIndex(
+                        (f) =>
+                          `${f.name}-${f.size}-${f.lastModified}` === fileKey
+                      );
+                      if (fileIndex >= 0) handleFileRemove(fileIndex);
+                    }}
                   >
                     <X />
                   </Button>

@@ -61,6 +61,8 @@ export const POST = async (request: Request) => {
   try {
     const formData = await request.formData();
     const file = formData.get("image") as File;
+    const courtId = formData.get("courtId") as string | null;
+    const checkinId = formData.get("checkinId") as string | null;
 
     if (!file) {
       return new Response(
@@ -111,19 +113,19 @@ export const POST = async (request: Request) => {
       })
     );
 
-    // Store the image in the database immediately without linking to review
-    // (since the review doesn't exist yet)
+    // Store the image in the database with optional court/checkin association
     await db.insert(image).values({
       imageId: id,
-
       userId,
+      courtId: courtId || null,
+      checkinId: checkinId || null,
     });
 
     return new Response(
       JSON.stringify({
         success: true,
         message: "Image uploaded successfully!",
-        data: { id },
+        data: { id, url: `${process.env.R2_PUBLIC_URL}/${key}` },
       }),
       { status: 200 }
     );
@@ -135,6 +137,66 @@ export const POST = async (request: Request) => {
         success: false,
         message:
           "We're having trouble uploading your image right now. Please try again.",
+      }),
+      { status: 500 }
+    );
+  }
+};
+
+export const GET = async (request: Request) => {
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session) {
+    return new Response(
+      JSON.stringify({ success: false, message: "Unauthorized" }),
+      { status: 401 }
+    );
+  }
+
+  try {
+    const url = new URL(request.url);
+    const courtId = url.searchParams.get("courtId");
+    const checkinId = url.searchParams.get("checkinId");
+
+    if (!courtId && !checkinId) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: "Either courtId or checkinId is required",
+        }),
+        { status: 400 }
+      );
+    }
+
+    const images = await db.query.image.findMany({
+      where: (image, { eq, or }) => {
+        const conditions = [];
+        if (courtId) conditions.push(eq(image.courtId, courtId));
+        if (checkinId) conditions.push(eq(image.checkinId, checkinId));
+        return conditions.length === 1 ? conditions[0] : or(...conditions);
+      },
+    });
+
+    // Add full URL to each image
+    const imagesWithUrls = images.map((img) => ({
+      ...img,
+      url: `${process.env.R2_PUBLIC_URL}/${session.user?.id}/${img.imageId}.webp`,
+    }));
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: imagesWithUrls,
+      }),
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Image fetch error details:", error);
+
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: "Failed to fetch images",
       }),
       { status: 500 }
     );

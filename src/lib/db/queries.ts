@@ -5,6 +5,7 @@ import type {
   Court,
   Courts,
   CourtWithCheckIns,
+  ImagesWithUrl,
   NewCheckIn,
   NewCourt,
 } from "./schema";
@@ -24,7 +25,7 @@ export const getCourt = async (id: Court["id"]) => {
 
 export const getCourts = async () => {
   const { success, data, message } = await fetchApi<ResponseObject<Courts>>(
-    "/api/courts",
+    "/api/court",
     {
       method: "GET",
       headers: {
@@ -38,7 +39,7 @@ export const getCourts = async () => {
 
 export const addCourt = async (court: NewCourt) => {
   const { success, data, message } = await fetchApi<ResponseObject<Court>>(
-    "/api/courts",
+    "/api/court",
     {
       method: "POST",
       body: JSON.stringify(court),
@@ -78,7 +79,7 @@ export const getCheckIn = async (id: CheckIn["id"]) => {
 
 export const addCheckin = async (courtId: NewCheckIn["courtId"]) => {
   const { success, data, message } = await fetchApi<ResponseObject<CheckIn>>(
-    "/api/checkins",
+    "/api/checkin",
     {
       method: "POST",
       body: JSON.stringify({ courtId }),
@@ -90,7 +91,7 @@ export const addCheckin = async (courtId: NewCheckIn["courtId"]) => {
 
 export const getCheckins = async (courtId: NewCheckIn["courtId"]) => {
   const { success, data, message } = await fetchApi<ResponseObject<CheckIn[]>>(
-    `/api/checkins?courtId=${courtId}`,
+    `/api/checkin?courtId=${courtId}`,
     {
       method: "GET",
       headers: {
@@ -108,6 +109,51 @@ export const editCheckIn = async (checkIn: Partial<CheckIn>) => {
     {
       method: "PUT",
       body: JSON.stringify(checkIn),
+    }
+  );
+
+  return { success, data, message };
+};
+
+// Images
+
+export const uploadImage = async (formData: FormData) => {
+  const { success, data, message } = await fetchApi<
+    ResponseObject<{ id: string; url: string }>
+  >("/api/image", {
+    method: "POST",
+    body: formData,
+  });
+
+  return { success, data, message };
+};
+
+export const getImages = async (params: {
+  courtId?: string;
+  checkinId?: string;
+}) => {
+  const searchParams = new URLSearchParams();
+  if (params.courtId) searchParams.set("courtId", params.courtId);
+  if (params.checkinId) searchParams.set("checkinId", params.checkinId);
+
+  const { success, data, message } = await fetchApi<
+    ResponseObject<ImagesWithUrl>
+  >(`/api/image?${searchParams.toString()}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  return { success, data, message };
+};
+
+export const deleteImage = async (imageId: string) => {
+  const { success, data, message } = await fetchApi<ResponseObject<null>>(
+    "/api/image",
+    {
+      method: "DELETE",
+      body: JSON.stringify({ id: imageId }),
     }
   );
 
