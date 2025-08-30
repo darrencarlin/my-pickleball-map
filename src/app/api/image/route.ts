@@ -5,11 +5,21 @@ import {
 } from "@aws-sdk/client-s3";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
-import sharp from "sharp";
 import { auth } from "@/lib/auth/auth";
 import { CLOUDFLARE_BUCKET } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { image } from "@/lib/db/schema";
+
+// Dynamic import Sharp to handle module loading issues
+const getSharp = async () => {
+  try {
+    const { default: sharp } = await import("sharp");
+    return sharp;
+  } catch (error) {
+    console.error("Failed to load Sharp:", error);
+    throw new Error("Image processing unavailable");
+  }
+};
 
 const CONFIG = {
   MAX_WIDTH: 800,
@@ -86,6 +96,9 @@ export const POST = async (request: Request) => {
     }
 
     const arrayBuffer = await file.arrayBuffer();
+    
+    // Get Sharp instance
+    const sharp = await getSharp();
 
     const resizedBuffer = await sharp(Buffer.from(arrayBuffer))
       .rotate()
