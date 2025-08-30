@@ -33,9 +33,6 @@ export const appSlice = createSlice({
   name: "app",
   initialState,
   reducers: {
-    setCourt: (state, action) => {
-      state.court = action.payload;
-    },
     setVisibleCourts: (state, action: Payload<Court[]>) => {
       state.visibleCourts = action.payload;
     },
@@ -62,7 +59,6 @@ export const appSlice = createSlice({
 });
 
 export const {
-  setCourt,
   setVisibleCourts,
   setBounds,
   setViewState,

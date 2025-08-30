@@ -3,9 +3,7 @@
 import Link from "next/link";
 import { useRef } from "react";
 import type { Court } from "@/lib/db/schema";
-import { useOutsideClick } from "@/lib/hooks/use-outside-click";
-import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { setCourt } from "@/lib/redux/slices/app";
+import { useAppSelector } from "@/lib/redux/hooks";
 import { useAddCheckin } from "@/lib/tanstack/hooks/check-ins";
 import { useEditCourt } from "@/lib/tanstack/hooks/courts";
 import { Button } from "../ui/button";
@@ -14,16 +12,12 @@ const CourtCardContent = ({
   court,
   handleCheckIn,
   isPending,
-  handleCloseCourtCard,
 }: {
   court: Court;
   handleCheckIn: (court: Court) => void;
   isPending: boolean;
-  handleCloseCourtCard: () => void;
 }) => {
   const cardRef = useRef<HTMLDivElement | null>(null);
-
-  useOutsideClick(cardRef, handleCloseCourtCard);
 
   return (
     <div
@@ -53,15 +47,10 @@ const CourtCardContent = ({
 };
 
 export const CourtCard = () => {
-  const dispatch = useAppDispatch();
   const { mutate: editCourt, isPending } = useEditCourt();
   const { mutate: addCheckin } = useAddCheckin();
   const visibleCourts = useAppSelector((state) => state.app.visibleCourts);
   const court = useAppSelector((state) => state.app.court);
-
-  const handleCloseCourtCard = () => {
-    dispatch(setCourt(null));
-  };
 
   const handleCheckIn = (court: Court) => {
     const body: Partial<Court> = {
@@ -75,10 +64,6 @@ export const CourtCard = () => {
     addCheckin(court.id);
   };
 
-  const handleSelectCourt = (selectedCourt: Court) => {
-    dispatch(setCourt(selectedCourt));
-  };
-
   // Priority 1: Show visible courts if there's exactly one and no manually selected court
   if (visibleCourts.length === 1 && !court) {
     return (
@@ -86,7 +71,6 @@ export const CourtCard = () => {
         court={visibleCourts[0]}
         handleCheckIn={handleCheckIn}
         isPending={isPending}
-        handleCloseCourtCard={handleCloseCourtCard}
       />
     );
   }
@@ -98,7 +82,6 @@ export const CourtCard = () => {
         court={court}
         handleCheckIn={handleCheckIn}
         isPending={isPending}
-        handleCloseCourtCard={handleCloseCourtCard}
       />
     );
   }

@@ -18,6 +18,7 @@ export const court = pgTable(
     latitude: doublePrecision("latitude").notNull(),
     longitude: doublePrecision("longitude").notNull(),
     playCount: doublePrecision("play_count").notNull().default(0),
+    image: text("image"),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
@@ -79,7 +80,6 @@ export const checkIn = pgTable(
 
 export type NewCourt = Omit<Court, "id" | "createdAt" | "updatedAt">;
 export type Court = typeof court.$inferSelect;
-export type PartialCourt = Partial<Court>;
 export type Courts = Court[];
 export type CourtWithCheckIns = Court & { checkIns: CheckIn[] };
 
@@ -87,6 +87,34 @@ export type NewCheckIn = Omit<CheckIn, "id" | "createdAt" | "updatedAt">;
 export type CheckIn = typeof checkIn.$inferSelect;
 export type PartialCheckIn = Partial<CheckIn>;
 export type CheckIns = CheckIn[];
+
+export type NewImage = Omit<Image, "id" | "createdAt" | "updatedAt">;
+export type Image = typeof image.$inferSelect;
+export type Images = Image[];
+
+export const image = pgTable(
+  "image",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    imageId: text("image_id").notNull().unique(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+    userId: text("user_id") // Changed from uuid to text to match user.id
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    courtId: uuid("court_id").references(() => court.id, {
+      onDelete: "cascade",
+    }),
+    checkinId: uuid("checkin_id").references(() => checkIn.id, {
+      onDelete: "cascade",
+    }),
+  },
+  (table) => ({
+    courtIdIdx: index("image_court_id_idx").on(table.courtId),
+    checkinIdIdx: index("image_checkin_id_idx").on(table.checkinId),
+    userIdIdx: index("image_user_id_idx").on(table.userId), // Added missing user index
+  })
+);
 
 export const user = pgTable(
   "user",
@@ -198,11 +226,13 @@ export const verification = pgTable(
 export const courtRelations = relations(court, ({ one, many }) => ({
   user: one(user, { fields: [court.userId], references: [user.id] }),
   checkIns: many(checkIn),
+  images: many(image), // Added images relation
 }));
 
-export const checkInRelations = relations(checkIn, ({ one }) => ({
+export const checkInRelations = relations(checkIn, ({ one, many }) => ({
   court: one(court, { fields: [checkIn.courtId], references: [court.id] }),
   user: one(user, { fields: [checkIn.userId], references: [user.id] }),
+  images: many(image), // Added images relation
 }));
 
 export const userRelations = relations(user, ({ many }) => ({
@@ -210,6 +240,16 @@ export const userRelations = relations(user, ({ many }) => ({
   checkIns: many(checkIn),
   sessions: many(session),
   accounts: many(account),
+  images: many(image), // Added images relation
+}));
+
+export const imageRelations = relations(image, ({ one }) => ({
+  user: one(user, { fields: [image.userId], references: [user.id] }),
+  court: one(court, { fields: [image.courtId], references: [court.id] }),
+  checkIn: one(checkIn, {
+    fields: [image.checkinId],
+    references: [checkIn.id],
+  }),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({

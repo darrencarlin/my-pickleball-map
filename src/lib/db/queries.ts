@@ -7,13 +7,12 @@ import type {
   CourtWithCheckIns,
   NewCheckIn,
   NewCourt,
-  PartialCourt,
 } from "./schema";
 
 export const getCourt = async (id: Court["id"]) => {
   const { success, data, message } = await fetchApi<
     ResponseObject<CourtWithCheckIns>
-  >(`/api/courts/${id}`, {
+  >(`/api/court/${id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -49,9 +48,9 @@ export const addCourt = async (court: NewCourt) => {
   return { success, data, message };
 };
 
-export const editCourt = async (court: PartialCourt) => {
+export const editCourt = async (court: Partial<Court>) => {
   const { success, data, message } = await fetchApi<ResponseObject<Court>>(
-    `/api/courts/${court.id}`,
+    `/api/court/${court.id}`,
     {
       method: "PUT",
       body: JSON.stringify(court),
@@ -62,6 +61,20 @@ export const editCourt = async (court: PartialCourt) => {
 };
 
 // Checkins
+
+export const getCheckIn = async (id: CheckIn["id"]) => {
+  const { success, data, message } = await fetchApi<ResponseObject<CheckIn>>(
+    `/api/checkin/${id}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  return { success, data, message };
+};
 
 export const addCheckin = async (courtId: NewCheckIn["courtId"]) => {
   const { success, data, message } = await fetchApi<ResponseObject<CheckIn>>(
@@ -83,6 +96,18 @@ export const getCheckins = async (courtId: NewCheckIn["courtId"]) => {
       headers: {
         "Content-Type": "application/json",
       },
+    }
+  );
+
+  return { success, data, message };
+};
+
+export const editCheckIn = async (checkIn: Partial<CheckIn>) => {
+  const { success, data, message } = await fetchApi<ResponseObject<CheckIn>>(
+    `/api/checkin/${checkIn.id}`,
+    {
+      method: "PUT",
+      body: JSON.stringify(checkIn),
     }
   );
 

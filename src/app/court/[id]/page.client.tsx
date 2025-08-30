@@ -3,6 +3,7 @@
 import { format } from "date-fns";
 import { EllipsisVertical } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { BackButton } from "@/components/buttons/back-button";
 import {
   DropdownMenu,
@@ -29,7 +30,9 @@ export const PageClient = ({ id }: { id: string }) => {
               <EllipsisVertical className="text-white" />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuLabel>Edit Court</DropdownMenuLabel>
+              <DropdownMenuLabel>
+                <Link href={`/court/${id}/edit`}>Edit Court</Link>
+              </DropdownMenuLabel>
               <DropdownMenuItem>Delete Court</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -64,7 +67,11 @@ export const PageClient = ({ id }: { id: string }) => {
                         <EllipsisVertical />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuLabel>Edit Check-In</DropdownMenuLabel>
+                        <DropdownMenuLabel>
+                          <Link href={`/check-in/${checkIn.id}`}>
+                            Edit Check-In
+                          </Link>
+                        </DropdownMenuLabel>
                         <DropdownMenuItem>Delete Check-In</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

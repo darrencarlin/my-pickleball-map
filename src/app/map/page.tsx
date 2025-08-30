@@ -2,7 +2,6 @@ import { QueryClient } from "@tanstack/react-query";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AddLocationButton } from "@/components/buttons/add-location-button";
-import { SignOutButton } from "@/components/buttons/sign-out-button";
 import { CourtCard } from "@/components/cards/court-card";
 import { MyMap } from "@/components/map";
 import { MapProvider } from "@/components/map-provider";

@@ -3,6 +3,8 @@ export const BASE_URL =
     ? "https://www.mypickleballmap.com"
     : "http://localhost:3000";
 
+export const CLOUDFLARE_BUCKET = "images";
+
 // Query Keys
 
 export const COURT_QUERY_KEY = "court";

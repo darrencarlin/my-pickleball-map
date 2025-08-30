@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth/auth";
 import { db } from "@/lib/db";
-import { court } from "@/lib/db/schema";
+import { checkIn } from "@/lib/db/schema";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -22,16 +22,13 @@ export const GET = async (_request: Request, ctx: RouteContext) => {
 
   const { id } = await ctx.params;
 
-  const data = await db.query.court.findFirst({
-    where: and(eq(court.id, id), eq(court.userId, session.user.id)),
-    with: {
-      checkIns: true,
-    },
+  const data = await db.query.checkIn.findFirst({
+    where: and(eq(checkIn.id, id), eq(checkIn.userId, session.user.id)),
   });
 
   if (!data) {
     return new Response(
-      JSON.stringify({ success: false, message: "Court not found" }),
+      JSON.stringify({ success: false, message: "Checkin not found" }),
       { status: 404 }
     );
   }
@@ -46,31 +43,35 @@ export const PUT = async (request: Request, ctx: RouteContext) => {
     headers: await headers(),
   });
 
-  if (!session) {
+  if (!session || !session.user || !session.user.id) {
     return new Response(
       JSON.stringify({ success: false, message: "Unauthorized" }),
       { status: 401 }
     );
   }
-
   const body = await request.json();
 
   const { id } = await ctx.params;
 
+  if (!id) {
+    return new Response(
+      JSON.stringify({ success: false, message: "Missing checkInId" }),
+      { status: 400 }
+    );
+  }
+
   const data = await db
-    .update(court)
+    .update(checkIn)
     .set({ ...body, updatedAt: new Date() })
-    .where(and(eq(court.id, id), eq(court.userId, session.user.id)))
+    .where(and(eq(checkIn.id, id), eq(checkIn.userId, session.user.id)))
     .returning();
 
   return new Response(
     JSON.stringify({
       success: true,
       data: data[0],
-      message: "Court updated successfully",
+      message: "Check-in updated successfully",
     }),
-    {
-      status: 200,
-    }
+    { status: 200 }
   );
 };
