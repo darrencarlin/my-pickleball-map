@@ -30,7 +30,7 @@ const CourtCardContent = ({
       ref={cardRef}
       className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-50 bg-white/95 p-4 rounded-lg shadow-lg w-[calc(100%-2rem)] max-w-96"
     >
-      <p className="mb-2 text-lg font-bold">{court.name}</p>
+      <h3 className="mb-2 text-lg font-bold">{court.name}</h3>
       <p className="mb-4 text-gray-500">
         You have played at {court.name}{" "}
         <span className="font-bold">{court.playCount}</span> times.

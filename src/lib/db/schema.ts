@@ -14,6 +14,7 @@ export const court = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     name: text("name").notNull(),
+    description: text("description"),
     latitude: doublePrecision("latitude").notNull(),
     longitude: doublePrecision("longitude").notNull(),
     playCount: doublePrecision("play_count").notNull().default(0),
