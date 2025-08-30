@@ -1,15 +1,40 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { persistReducer, persistStore } from "redux-persist";
+import storage from "redux-persist/lib/storage";
 import { appSlice } from "./slices/app";
 import { modalSlice } from "./slices/modal";
 
-export const makeStore = () => {
-  return configureStore({
-    reducer: {
-      app: appSlice.reducer,
-      modal: modalSlice.reducer,
-    },
-  });
+// Persist configuration
+const persistConfig = {
+  key: "root",
+  storage,
+  whitelist: ["app"], // Only persist the app slice, not modal
 };
+
+// Combine reducers
+const rootReducer = combineReducers({
+  app: appSlice.reducer,
+  modal: modalSlice.reducer,
+});
+
+// Create persisted reducer
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+export const makeStore = () => {
+  const store = configureStore({
+    reducer: persistedReducer,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
+        },
+      }),
+  });
+  return store;
+};
+
+// Create persistor
+export const makePersistor = (store: AppStore) => persistStore(store);
 
 // Infer the type of makeStore
 export type AppStore = ReturnType<typeof makeStore>;

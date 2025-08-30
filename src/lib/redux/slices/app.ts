@@ -12,6 +12,7 @@ interface AppState {
     latitude: number;
     longitude: number;
   } | null;
+  hasInitializedLocation: boolean; // Track if we've set initial location
 }
 
 const initialState: AppState = {
@@ -25,6 +26,7 @@ const initialState: AppState = {
   },
   isSelectingLocation: false,
   customCoordinates: null,
+  hasInitializedLocation: false,
 };
 
 export const appSlice = createSlice({
@@ -53,6 +55,9 @@ export const appSlice = createSlice({
       state.customCoordinates = null;
       state.isSelectingLocation = false;
     },
+    setHasInitializedLocation: (state, action) => {
+      state.hasInitializedLocation = action.payload;
+    },
   },
 });
 
@@ -64,6 +69,7 @@ export const {
   setIsSelectingLocation,
   setCustomCoordinates,
   clearCustomCoordinates,
+  setHasInitializedLocation,
 } = appSlice.actions;
 
 export default appSlice.reducer;
