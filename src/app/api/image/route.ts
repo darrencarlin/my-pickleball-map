@@ -96,7 +96,7 @@ export const POST = async (request: Request) => {
     }
 
     const arrayBuffer = await file.arrayBuffer();
-    
+
     // Get Sharp instance
     const sharp = await getSharp();
 
