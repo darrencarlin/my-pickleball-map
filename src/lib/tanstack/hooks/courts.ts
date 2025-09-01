@@ -52,7 +52,7 @@ export const useAddCourt = () => {
   });
 };
 
-export const useEditCourt = ({ goBack }: { goBack?: boolean }) => {
+export const useEditCourt = ({ goBack = false }: { goBack?: boolean }) => {
   const queryClient = useQueryClient();
   const router = useRouter();
   return useMutation({

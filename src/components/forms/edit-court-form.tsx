@@ -39,7 +39,7 @@ interface Props {
 export const EditCourtForm = ({ id }: Props) => {
   const { data: court } = useCourt(id);
   const { data: existingImages } = useImages({ courtId: id });
-  const { mutate: updateCourt, isPending } = useEditCourt();
+  const { mutate: updateCourt, isPending } = useEditCourt({ goBack: true });
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
