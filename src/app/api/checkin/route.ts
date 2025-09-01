@@ -36,30 +36,42 @@ export const GET = async (request: Request) => {
 };
 
 export const POST = async (request: Request) => {
-  const body = await request.json();
+  try {
+    const body = await request.json();
 
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
 
-  if (!session || !session.user || !session.user.id) {
+    if (!session || !session.user || !session.user.id) {
+      return new Response(
+        JSON.stringify({ success: false, message: "Unauthorized" }),
+        { status: 401 }
+      );
+    }
+
+    const data = await db.insert(checkIn).values({
+      userId: session.user.id,
+      ...body,
+    });
+
     return new Response(
-      JSON.stringify({ success: false, message: "Unauthorized" }),
-      { status: 401 }
+      JSON.stringify({
+        success: true,
+        data,
+        message: "Check-in created successfully",
+      }),
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error creating check-in:", error);
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: "Failed to create check-in",
+        error: error instanceof Error ? error.message : "Unknown error",
+      }),
+      { status: 500 }
     );
   }
-
-  const data = await db.insert(checkIn).values({
-    userId: session.user.id,
-    ...body,
-  });
-
-  return new Response(
-    JSON.stringify({
-      success: true,
-      data,
-      message: "Check-in created successful",
-    }),
-    { status: 200 }
-  );
 };

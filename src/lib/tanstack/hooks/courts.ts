@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { COURT_QUERY_KEY, COURTS_QUERY_KEY } from "@/lib/constants";
+import { COURTS_QUERY_KEY } from "@/lib/constants";
 import { addCourt, editCourt, getCourt, getCourts } from "@/lib/db/queries";
 import type { Court, NewCourt } from "@/lib/db/schema";
 import { useAppDispatch } from "@/lib/redux/hooks";
@@ -51,20 +52,31 @@ export const useAddCourt = () => {
   });
 };
 
-export const useEditCourt = () => {
+export const useEditCourt = ({ goBack }: { goBack?: boolean }) => {
   const queryClient = useQueryClient();
-
+  const router = useRouter();
   return useMutation({
     mutationFn: async (court: Partial<Court>) => {
       const { data, success, message } = await editCourt(court);
       return { data, success, message };
     },
+    onSuccess: async (result) => {
+      const courtId = result?.data?.id;
+      if (courtId) {
+        // Invalidate specific court query
+        await queryClient.invalidateQueries({
+          queryKey: [COURTS_QUERY_KEY, courtId],
+        });
+      }
+      // Invalidate all courts queries to update lists
+      await queryClient.invalidateQueries({ queryKey: [COURTS_QUERY_KEY] });
+      // Go back to the previous page
+      if (goBack) {
+        router.back();
+      }
+    },
     onError: (error) => {
       toast.error(error.message ?? "Failed to update court");
-    },
-    onSettled: (result) => {
-      const id = result?.data?.id;
-      queryClient.invalidateQueries({ queryKey: [COURT_QUERY_KEY, id] });
     },
   });
 };

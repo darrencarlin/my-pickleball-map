@@ -37,10 +37,9 @@ interface Props {
 }
 
 export const EditCourtForm = ({ id }: Props) => {
-  const router = useRouter();
   const { data: court } = useCourt(id);
   const { data: existingImages } = useImages({ courtId: id });
-  const { mutate: updateCourt, isPending, isSuccess } = useEditCourt();
+  const { mutate: updateCourt, isPending } = useEditCourt();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -55,8 +54,6 @@ export const EditCourtForm = ({ id }: Props) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const court = { id, ...values };
     updateCourt(court);
-
-    if (isSuccess) router.back();
   };
 
   return (

@@ -47,7 +47,7 @@ const CourtCardContent = ({
 };
 
 export const CourtCard = () => {
-  const { mutate: editCourt, isPending } = useEditCourt();
+  const { mutate: editCourt, isPending } = useEditCourt({ goBack: false });
   const { mutate: addCheckin } = useAddCheckin();
   const visibleCourts = useAppSelector((state) => state.app.visibleCourts);
   const court = useAppSelector((state) => state.app.court);

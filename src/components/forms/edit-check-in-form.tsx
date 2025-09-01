@@ -49,10 +49,7 @@ export const EditCheckInForm = ({ id }: Props) => {
     const checkIn = { id, ...values };
     updateCheckIn(checkIn);
 
-    if (isSuccess) {
-      console.log("Check-in updated successfully");
-      router.back();
-    }
+    if (isSuccess && !isPending) router.back();
   };
 
   return (
