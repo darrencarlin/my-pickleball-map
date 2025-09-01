@@ -1,0 +1,24 @@
+{
+	"id": "my-pickleball-map",
+	"name": "My Pickleball Map",
+	"short_name": "My Pickleball Map",
+	"description": "Create your own Pickle Ball map",
+	"start_url": "/",
+	"display": "standalone",
+	"theme_color": "#18181B",
+	"background_color": "#18181B",
+	"icons": [
+		{
+			"src": "/icons/android-chrome-192x192.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "maskable"
+		},
+		{
+			"src": "/icons/icon-512x512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "any"
+		}
+	]
+}

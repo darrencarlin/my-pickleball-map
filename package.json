@@ -20,6 +20,7 @@
 		"@radix-ui/react-separator": "^1.1.7",
 		"@radix-ui/react-slot": "^1.2.3",
 		"@reduxjs/toolkit": "^2.8.2",
+		"@serwist/next": "^9.2.0",
 		"@tanstack/react-query": "^5.85.5",
 		"@tanstack/react-query-devtools": "^5.85.5",
 		"@types/mapbox-gl": "^3.4.1",
@@ -40,6 +41,7 @@
 		"react-map-gl": "^8.0.4",
 		"react-redux": "^9.2.0",
 		"redux-persist": "^6.0.0",
+		"serwist": "^9.2.0",
 		"sonner": "^2.0.7",
 		"tailwind-merge": "^3.3.1",
 		"zod": "^4.1.4"
