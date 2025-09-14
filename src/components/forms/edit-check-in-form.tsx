@@ -96,14 +96,42 @@ export const EditCheckInForm = ({ id }: Props) => {
         {/* New Image Upload */}
         <div className="space-y-2">
           <FormLabel>Add New Images</FormLabel>
-          <MediaUpload
-            value={selectedFiles}
-            onChange={setSelectedFiles}
-            checkinId={id}
-            maxFiles={3}
-            multiple={true}
-            autoUpload={true}
-          />
+          {(() => {
+            const maxTotalImages = 3;
+            const existingImageCount = existingImages?.length || 0;
+            const maxNewImages = Math.max(
+              0,
+              maxTotalImages - existingImageCount
+            );
+
+            if (maxNewImages === 0) {
+              return (
+                <p className="text-sm text-muted-foreground">
+                  Maximum of {maxTotalImages} images reached. Delete existing
+                  images above to add new ones.
+                </p>
+              );
+            }
+
+            return (
+              <div className="space-y-2">
+                <MediaUpload
+                  value={selectedFiles}
+                  onChange={setSelectedFiles}
+                  checkinId={id}
+                  maxFiles={maxNewImages}
+                  multiple={maxNewImages > 1}
+                  autoUpload={true}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {maxNewImages} of {maxTotalImages} slots available{" "}
+                  {existingImageCount > 0
+                    ? `(${existingImageCount} existing)`
+                    : ""}
+                </p>
+              </div>
+            );
+          })()}
         </div>
 
         <Button type="submit" className="w-full">

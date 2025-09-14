@@ -4,8 +4,10 @@ import { format } from "date-fns";
 import { EllipsisVertical } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { BackButton } from "@/components/buttons/back-button";
 import { ImageCarousel } from "@/components/image-carousel";
+import { MediaUpload } from "@/components/media-upload";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -82,29 +84,84 @@ export const PageClient = ({ id }: { id: string }) => {
 // Separate component for check-in card to handle individual image loading
 const CheckInCard = ({ checkIn }: { checkIn: CheckIn }) => {
   const { data: checkInImages } = useImages({ checkinId: checkIn.id });
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+  // Show image upload if there are no title, notes AND no images (indicating a completely fresh check-in)
+  const showImageUpload =
+    !checkIn.title &&
+    !checkIn.notes &&
+    (!checkInImages || checkInImages.length === 0);
 
   return (
     <div>
       <div className="px-4 py-6">
-        <div className="grid grid-cols-[1fr_auto] mb-2 items-center">
-          <p className="font-bold text-lg">{checkIn.title ?? "No Title"}</p>
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <EllipsisVertical />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuLabel>
-                <Link prefetch href={`/check-in/${checkIn.id}`}>
-                  Edit Check-In
-                </Link>
-              </DropdownMenuLabel>
-              <DropdownMenuItem>Delete Check-In</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        <p className="mb-4">{checkIn.notes ?? "No Notes"}</p>
+        {showImageUpload ? (
+          // Show image upload interface for fresh check-ins
+          <div className="space-y-4">
+            {(() => {
+              const maxTotalImages = 3;
+              const existingImageCount = checkInImages?.length || 0;
+              const maxNewImages = Math.max(
+                0,
+                maxTotalImages - existingImageCount
+              );
 
-        {/* Check-in image carousel */}
+              if (maxNewImages === 0) {
+                return (
+                  <div>
+                    <p className="font-bold text-lg">Maximum images reached</p>
+                    <p className="text-sm text-muted-foreground">
+                      You have {existingImageCount} of {maxTotalImages} images.
+                      Delete existing images to add new ones.
+                    </p>
+                  </div>
+                );
+              }
+
+              return (
+                <>
+                  <p className="font-bold text-lg">
+                    Add your first image to get started!
+                  </p>
+                  <MediaUpload
+                    value={selectedFiles}
+                    onChange={setSelectedFiles}
+                    checkinId={checkIn.id}
+                    maxFiles={maxNewImages}
+                    multiple={maxNewImages > 1}
+                    autoUpload={true}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {maxNewImages} of {maxTotalImages} slots available
+                  </p>
+                </>
+              );
+            })()}
+          </div>
+        ) : (
+          // Show normal check-in content
+          <>
+            <div className="grid grid-cols-[1fr_auto] mb-2 items-center">
+              <p className="font-bold text-lg">{checkIn.title || "No title"}</p>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <EllipsisVertical />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>
+                    <Link prefetch href={`/check-in/${checkIn.id}`}>
+                      Edit Check-In
+                    </Link>
+                  </DropdownMenuLabel>
+                  <DropdownMenuItem>Delete Check-In</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            <p className="mb-4">{checkIn.notes || "No notes"}</p>
+          </>
+        )}
+
+        {/* Check-in image carousel - always show if images exist */}
         {checkInImages && checkInImages.length > 0 && (
           <div className="mb-4">
             <ImageCarousel images={checkInImages} className="max-w-md" />
