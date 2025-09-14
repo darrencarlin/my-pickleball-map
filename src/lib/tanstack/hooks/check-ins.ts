@@ -56,9 +56,6 @@ export const useAddCheckin = () => {
       return { data, success, message };
     },
     onSuccess: (_result, courtId) => {
-      // Show success message
-      toast.success("Check-in added successfully!");
-
       // Invalidate queries to update UI
       queryClient.invalidateQueries({ queryKey: [COURTS_QUERY_KEY, courtId] });
       queryClient.invalidateQueries({ queryKey: [COURTS_QUERY_KEY] });
@@ -66,7 +63,6 @@ export const useAddCheckin = () => {
       queryClient.invalidateQueries({ queryKey: [CHECKINS_QUERY_KEY] });
     },
     onError: (error) => {
-      console.error("Add check-in error:", error);
       toast.error(error.message ?? "Failed to add check-in");
     },
   });

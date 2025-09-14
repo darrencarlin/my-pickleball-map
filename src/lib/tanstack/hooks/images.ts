@@ -24,8 +24,6 @@ export const useUploadImage = () => {
       return data;
     },
     onSuccess: (_data, formData) => {
-      toast.success("Image uploaded successfully!");
-
       // Invalidate relevant image queries
       const courtId = formData.get("courtId") as string | null;
       const checkinId = formData.get("checkinId") as string | null;
@@ -58,7 +56,6 @@ export const useDeleteImage = () => {
       return imageId;
     },
     onSuccess: () => {
-      toast.success("Image deleted successfully!");
       // Invalidate all image queries to refresh the lists
       queryClient.invalidateQueries({ queryKey: [IMAGES_QUERY_KEY] });
     },

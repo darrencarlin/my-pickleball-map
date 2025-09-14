@@ -100,7 +100,7 @@ export const EditCheckInForm = ({ id }: Props) => {
             value={selectedFiles}
             onChange={setSelectedFiles}
             checkinId={id}
-            maxFiles={10}
+            maxFiles={3}
             multiple={true}
             autoUpload={true}
           />

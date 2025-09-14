@@ -1,6 +1,8 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { adminClient } from "better-auth/client/plugins";
 import { nextCookies } from "better-auth/next-js";
+import { admin } from "better-auth/plugins/admin";
 import * as schema from "@/lib/db/schema";
 import { db } from "../db";
 
@@ -20,5 +22,5 @@ export const auth = betterAuth({
     enabled: true,
     autoSignIn: true,
   },
-  plugins: [nextCookies()],
+  plugins: [nextCookies(), admin(), adminClient()],
 });

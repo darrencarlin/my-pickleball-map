@@ -89,21 +89,6 @@ export const EditCourtForm = ({ id }: Props) => {
           )}
         />
 
-        {/* Legacy Image URL */}
-        <FormField
-          control={form.control}
-          name="image"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Image URL (Legacy)</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         {/* Existing Images */}
         {existingImages && existingImages.length > 0 && (
           <div className="space-y-2">
@@ -119,7 +104,7 @@ export const EditCourtForm = ({ id }: Props) => {
             value={selectedFiles}
             onChange={setSelectedFiles}
             courtId={id}
-            maxFiles={10}
+            maxFiles={1}
             multiple={true}
             autoUpload={true}
           />
